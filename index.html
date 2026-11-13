@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Refinance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Лёгкий, воздушный мир как у референса: светлый фон, телефон с ботом, живые цифры.
+   Красный = переплата, зелёный = экономия. Один шрифт, крупные цифры как главный герой. */
+:root{
+  --bg:#F2F4F6;
+  --surface:#FFFFFF;
+  --ink:#0F1A22;
+  --muted:#5A6672;
+  --line:#DDE2E7;
+  --save:#0A8A5F;
+  --save-soft:#E3F4EC;
+  --loss:#D9481F;
+  --loss-soft:#FBE9E3;
+  --warn:#B7790A;
+  --warn-soft:#FBF1DC;
+  --tg:#2AABEE;
+  --brand:#FF6A1F;
+  --font:"Onest", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+h1,h2,h3{margin:0;text-wrap:balance;letter-spacing:-0.02em}
+p{margin:0}
+.num{font-variant-numeric:tabular-nums}
+.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+:focus-visible{outline:3px solid var(--tg);outline-offset:2px;border-radius:8px}
+
+/* nav */
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-0.03em;text-decoration:none}
+.logo-mark{width:32px;height:32px;border-radius:9px;background:#000;color:var(--brand);display:grid;place-items:center;font-weight:800;font-size:15px;letter-spacing:-0.04em}
+.nav-links{display:flex;gap:28px;font-size:15px;color:var(--muted)}
+.nav-links a{text-decoration:none}
+.nav-links a:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;font:600 16px/1 var(--font);padding:15px 24px;cursor:pointer;text-decoration:none;transition:transform .15s ease, background .15s ease}
+.btn:hover{transform:translateY(-1px)}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-light{background:var(--surface);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.btn-sm{padding:11px 18px;font-size:15px}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;padding:40px 0 72px}
+.pill{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border-radius:999px;padding:7px 14px 7px 8px;font-size:14px;font-weight:600;box-shadow:inset 0 0 0 1px var(--line)}
+.pill i{width:22px;height:22px;border-radius:50%;background:var(--tg);display:grid;place-items:center}
+.hero h1{font-size:clamp(40px,5.6vw,72px);line-height:1.02;font-weight:800;margin:22px 0 20px}
+.hero h1 .loss{color:var(--loss)}
+.hero .lead{font-size:19px;color:var(--muted);max-width:30em}
+.hero .ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.ticker{margin-top:36px;display:flex;gap:16px;align-items:baseline;flex-wrap:wrap}
+.ticker b{font-size:30px;font-weight:700;color:var(--loss);letter-spacing:-0.02em}
+.ticker span{font-size:14px;color:var(--muted);max-width:20em}
+
+
+.hstats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:28px;border-top:1px solid var(--line)}
+.hstat{padding:20px 18px 0 0}
+.hstat + .hstat{padding-left:18px;border-left:1px solid var(--line)}
+.hstat b{display:block;white-space:nowrap;font-size:clamp(34px,3.6vw,48px);font-weight:800;letter-spacing:-0.045em;line-height:1}
+.hstat b em{font-style:normal;font-size:.5em;letter-spacing:-0.02em;margin-left:2px}
+.hstat p{font-size:14px;line-height:1.4;margin-top:10px}
+.hstat small{display:block;font-size:12px;color:var(--muted);margin-top:6px}
+@media (max-width:480px){.hstats{grid-template-columns:1fr}.hstat + .hstat{padding-left:0;border-left:0;border-top:1px solid var(--line)}}
+
+/* phone */
+.stage{position:relative;display:grid;place-items:center;min-height:560px}
+.phone{width:300px;height:600px;border-radius:46px;background:#0F1A22;padding:12px;box-shadow:0 40px 80px -30px rgba(15,26,34,.45)}
+.screen{height:100%;border-radius:36px;background:#DCE6EE;overflow:hidden;display:flex;flex-direction:column}
+.tg-top{background:#fff;padding:34px 16px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #E6EBEF}
+.avatar{width:36px;height:36px;border-radius:50%;background:#000;color:var(--brand);display:grid;place-items:center;flex:none;font-weight:800;font-size:14px;letter-spacing:-0.04em}
+.tg-top b{font-size:15px;display:block;line-height:1.2}
+.tg-top small{font-size:12px;color:var(--tg)}
+.chat{flex:1;padding:16px 12px;display:flex;flex-direction:column;gap:10px;justify-content:flex-end}
+.msg{background:#fff;border-radius:16px 16px 16px 6px;padding:10px 12px;font-size:13.5px;line-height:1.42;max-width:92%;box-shadow:0 1px 1px rgba(0,0,0,.05)}
+.msg.me{align-self:flex-end;background:#E2F7CB;border-radius:16px 16px 6px 16px}
+.msg .big{display:block;font-size:22px;font-weight:800;color:var(--save);margin:4px 0 2px;letter-spacing:-0.02em}
+.msg .time{display:block;text-align:right;font-size:10.5px;color:#8A97A3;margin-top:4px}
+.msg-btn{display:block;text-align:center;background:#fff;color:var(--tg);font-weight:600;font-size:13px;border-radius:12px;padding:9px;margin-top:-4px;box-shadow:0 1px 1px rgba(0,0,0,.05)}
+.float{position:absolute;background:var(--surface);border-radius:18px;padding:12px 16px;box-shadow:0 18px 40px -18px rgba(15,26,34,.35);font-size:13px;color:var(--muted)}
+.float b{display:block;font-size:20px;color:var(--ink);letter-spacing:-0.02em}
+.float.f1{left:0;top:200px}
+.float.f1 b{color:var(--loss)}
+.float.f2{right:0;bottom:90px}
+.float.f2 b{color:var(--save)}
+
+/* sections */
+section{padding:72px 0}
+.sec-head{max-width:640px;margin-bottom:36px}
+.sec-head h2{font-size:clamp(30px,3.6vw,44px);line-height:1.08;font-weight:800}
+.sec-head p{color:var(--muted);margin-top:14px;font-size:18px}
+
+/* calculator */
+.calc{display:grid;grid-template-columns:1fr 1.1fr;background:var(--surface);border-radius:32px;overflow:hidden;box-shadow:0 1px 0 var(--line)}
+.calc-in{padding:36px;display:grid;gap:22px;align-content:start;border-right:1px solid var(--line)}
+.field label{display:flex;justify-content:space-between;gap:12px;font-size:14px;font-weight:600;margin-bottom:8px}
+.field label span{color:var(--muted);font-weight:500}
+.field .box{display:flex;align-items:center;background:var(--bg);border-radius:14px;padding:0 16px;box-shadow:inset 0 0 0 1px transparent;transition:box-shadow .15s}
+.field .box:focus-within{box-shadow:inset 0 0 0 2px var(--ink)}
+.field input[type=number]{flex:1;min-width:0;border:0;background:transparent;font:600 20px/1 var(--font);padding:14px 0;color:var(--ink);font-variant-numeric:tabular-nums}
+.field input[type=number]:focus{outline:none}
+.field .unit{color:var(--muted);font-weight:600}
+.field input[type=range]{width:100%;margin-top:10px;accent-color:var(--ink)}
+.hint{font-size:13px;color:var(--muted);margin-top:6px}
+.calc-out{padding:36px;display:flex;flex-direction:column;gap:22px}
+.verdict{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:8px 14px;font-weight:700;font-size:14px}
+.verdict.good{background:var(--save-soft);color:var(--save)}
+.verdict.mid{background:var(--warn-soft);color:var(--warn)}
+.verdict.bad{background:var(--loss-soft);color:var(--loss)}
+.verdict::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.headline-num{font-size:clamp(44px,5.4vw,68px);font-weight:800;letter-spacing:-0.04em;line-height:1}
+.headline-num.good{color:var(--save)}
+.headline-num.bad{color:var(--loss)}
+.headline-cap{color:var(--muted);margin-top:8px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cmp{border-radius:18px;padding:16px 18px}
+.cmp.now{background:var(--loss-soft)}
+.cmp.new{background:var(--save-soft)}
+.cmp small{display:block;font-size:13px;color:var(--muted);font-weight:600}
+.cmp b{display:block;font-size:24px;letter-spacing:-0.02em;margin-top:4px}
+.cmp em{font-style:normal;font-size:13px;color:var(--muted)}
+.rows{display:grid;gap:0;border-top:1px solid var(--line)}
+.rows div{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--line);font-size:15px}
+.rows div span:first-child{color:var(--muted)}
+.rows div b{font-weight:700}
+
+/* watch form */
+.watch{display:grid;grid-template-columns:1fr auto;gap:28px;align-items:center;background:var(--ink);color:#fff;border-radius:32px;padding:40px;margin-top:24px}
+.watch h3{font-size:28px;line-height:1.15;font-weight:800}
+.watch p{color:#AAB6C1;margin-top:10px;max-width:34em}
+.watch form{display:flex;gap:10px;flex-wrap:wrap}
+.watch input{width:260px;max-width:100%;border:0;border-radius:999px;padding:15px 20px;font:500 16px var(--font);background:#1F2C36;color:#fff}
+.watch input::placeholder{color:#8695A2}
+.watch .btn{background:var(--tg);color:#fff}
+.done{display:none;background:#1F2C36;border-radius:20px;padding:18px 20px;max-width:360px}
+.done b{display:block;font-size:17px}
+.done span{font-size:14px;color:#AAB6C1}
+.err{color:#FF9C7E;font-size:14px;width:100%}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;counter-reset:s}
+.step{background:var(--surface);border-radius:28px;padding:30px;display:flex;flex-direction:column;gap:12px;min-height:240px}
+.step::before{counter-increment:s;content:counter(s);width:40px;height:40px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-weight:800}
+.step h3{font-size:22px;font-weight:700}
+.step p{color:var(--muted);font-size:16px}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line)}
+.stat{padding:28px 28px 8px 0}
+.stat + .stat{padding-left:28px;border-left:1px solid var(--line)}
+.stat b{display:block;white-space:nowrap;font-size:clamp(32px,3.6vw,48px);font-weight:800;letter-spacing:-0.04em;line-height:1}
+.stat p{margin-top:12px;font-size:16px}
+.stat small{display:block;margin-top:8px;font-size:13px;color:var(--muted)}
+
+/* faq */
+.faq{display:grid;grid-template-columns:.8fr 1.2fr;gap:48px}
+details{border-bottom:1px solid var(--line);padding:20px 0}
+details:first-child{border-top:1px solid var(--line)}
+summary{cursor:pointer;font-weight:700;font-size:19px;list-style:none;display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-weight:500;font-size:24px;line-height:1;color:var(--muted)}
+details[open] summary::after{content:"−"}
+details p{color:var(--muted);margin-top:12px;max-width:40em}
+
+footer{padding:40px 0 56px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid var(--line)}
+
+
+/* motion: one orchestrated load sequence, then gentle ambient float */
+@keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+@keyframes phoneIn{0%{opacity:0;transform:translate(160px,60px) rotate(8deg) scale(.92)}60%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes typingOut{to{opacity:0;height:0;padding:0;margin:0}}
+@keyframes dot{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+.anim{animation:rise .9s cubic-bezier(.2,.75,.2,1) var(--d,0s) both}
+.rise-phone{animation:phoneIn 1.3s cubic-bezier(.16,.8,.25,1) .3s both}
+.pop{animation:pop .5s cubic-bezier(.2,.8,.3,1.2) var(--d,0s) both}
+.float.bob{animation:pop .6s cubic-bezier(.2,.8,.3,1.2) var(--d,0s) both}
+.typing{align-self:flex-start;display:flex;gap:4px;background:#fff;border-radius:16px 16px 16px 6px;padding:12px 14px;animation:pop .4s ease var(--d) both, typingOut .25s ease 2.5s forwards}
+.typing i{width:6px;height:6px;border-radius:50%;background:#8A97A3;animation:dot 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+.btn-dark:hover{box-shadow:0 10px 24px -10px rgba(15,26,34,.6)}
+
+.reveal{transition:opacity .7s ease var(--d,0s), transform .75s cubic-bezier(.2,.8,.3,1.15) var(--d,0s)}
+.reveal.pre{opacity:0;transform:translateY(36px) scale(.97)}
+@media (prefers-reduced-motion:reduce){.reveal{transition:none!important}.anim,.rise-phone,.pop,.float.bob,.typing,.typing i{animation:none!important}.typing{display:none}}
+
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;gap:24px;padding-bottom:40px}
+  .stage{min-height:0;padding:20px 0}
+  .calc{grid-template-columns:1fr}
+  .calc-in{border-right:0;border-bottom:1px solid var(--line)}
+  .watch{grid-template-columns:1fr}
+  .steps,.stats{grid-template-columns:1fr}
+  .stat + .stat{padding-left:0;border-left:0;border-top:1px solid var(--line)}
+  .faq{grid-template-columns:1fr;gap:20px}
+  .nav-links{display:none}
+}
+@media (max-width:480px){
+  .wrap{padding:0 16px}
+  .float{display:none}
+  .phone{width:270px;height:540px}
+  .calc-in,.calc-out,.watch{padding:24px}
+  .compare{grid-template-columns:1fr}
+  section{padding:52px 0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="nav">
+    <a class="logo" href="#top" aria-label="Refinance">
+      <span class="logo-mark" aria-hidden="true">Re</span>
+      Refinance
+    </a>
+    <nav class="nav-links" aria-label="Разделы">
+      <a href="#calc">Калькулятор</a>
+      <a href="#how">Как это работает</a>
+      <a href="#faq">Вопросы</a>
+    </nav>
+    <a class="btn btn-dark btn-sm" href="#calc">Проверить кредит</a>
+  </header>
+
+  <main id="top">
+    <div class="hero">
+      <div>
+        <span class="pill anim" style="--d:.05s"><i aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M21.5 3.6 2.9 10.8c-1.3.5-1.3 1.2-.2 1.6l4.8 1.5 1.8 5.6c.2.6.1.9.8.9.5 0 .7-.2 1-.5l2.4-2.3 4.9 3.6c.9.5 1.6.2 1.8-.8l3.2-15.2c.3-1.3-.5-1.9-1.7-1.6Z"/></svg></i>Сторож кредитов в Telegram</span>
+        <h1 class="anim" style="--d:.15s">Вы платите за кредит <span class="loss">больше, чем могли&nbsp;бы</span></h1>
+        <p class="lead anim" style="--d:.3s">Мы каждый день сверяем ставки банков с вашим кредитом и пишем в Telegram, когда перевести его в другой банк станет выгодно. С точной суммой экономии.</p>
+        <div class="hstats anim" style="--d:.45s">
+          <div class="hstat"><b class="num"><span data-to="430.5" data-dec="1">430,5</span><em> млрд ₽</em></b><p>ушло на погашение старых кредитов новыми за январь–июнь 2026, +209% к прошлому году</p><small>Объединённое кредитное бюро</small></div>
+          <div class="hstat"><b class="num">−<span data-to="25" data-dec="0">25</span><em>%</em></b><p>в среднем снизился платёж клиентов ВТБ после рефинансирования</p><small>ВТБ, данные Сравни</small></div>
+          <div class="hstat"><b class="num"><span data-to="34.35" data-dec="2">34,35</span><em>%</em></b><p>средняя полная стоимость кредита без залога на 23 октября 2026</p><small>Мониторинг Финуслуг</small></div>
+        </div>
+        <div class="ctas anim" style="--d:.6s">
+          <a class="btn btn-dark" href="#calc">Проверить мой кредит</a>
+          <a class="btn btn-light" href="#how">Как это работает</a>
+        </div>
+        <div class="ticker anim" style="--d:.75s" aria-live="off">
+          <b class="num" id="tick">0,00 ₽</b>
+          <span id="tickCap">переплачено с 1 января по кредиту из калькулятора ниже</span>
+        </div>
+      </div>
+
+      <div class="stage" aria-label="Пример сообщения бота">
+        <div class="phone rise-phone">
+          <div class="screen">
+            <div class="tg-top">
+              <span class="avatar" aria-hidden="true">Re</span>
+              <div><b>Refinance</b><small>бот</small></div>
+            </div>
+            <div class="chat">
+              <div class="msg me pop" style="--d:1.1s">Слежу за кредитом 400 000 ₽ под 32%<span class="time">12:04 ✓✓</span></div>
+              <div class="typing pop" style="--d:1.6s" aria-hidden="true"><i></i><i></i><i></i></div>
+              <div class="msg pop" style="--d:2.6s">Ставки в банках снизились. Ваш кредит можно перевести под <b>20%</b>.
+                <span class="big num" id="phoneSave">−30 676 ₽ в год</span>
+                Платёж станет <b class="num" id="phonePay">14 865 ₽</b> вместо <span class="num" id="phoneOld">17 422 ₽</span>.
+                <span class="time">09:15</span></div>
+              <span class="msg-btn pop" style="--d:3s">Показать банки</span>
+            </div>
+          </div>
+        </div>
+        <div class="float f1 bob" style="--d:1.4s">Переплата в месяц<b class="num" id="floatLoss">2 556 ₽</b></div>
+        <div class="float f2 bob" style="--d:3.2s">Экономия за весь срок<b class="num" id="floatSave">92 028 ₽</b></div>
+      </div>
+    </div>
+
+    <section id="calc" style="padding-top:24px">
+      <div class="sec-head reveal">
+        <h2>Сколько вы переплачиваете</h2>
+        <p>Введите данные своего кредита. Их можно посмотреть в приложении банка.</p>
+      </div>
+
+      <div class="calc reveal" id="calcBox">
+        <form class="calc-in" id="calcForm" onsubmit="return false">
+          <div class="field">
+            <label for="debt">Остаток долга</label>
+            <div class="box"><input id="debt" type="number" min="10000" max="10000000" step="1000" value="400000" inputmode="numeric"><span class="unit">₽</span></div>
+          </div>
+          <div class="field">
+            <label for="rate">Ставка сейчас <span>годовых</span></label>
+            <div class="box"><input id="rate" type="number" min="1" max="99" step="0.1" value="32" inputmode="decimal"><span class="unit">%</span></div>
+          </div>
+          <div class="field">
+            <label for="months">Осталось платить <span id="monthsLabel">36 мес.</span></label>
+            <input id="months" type="range" min="3" max="84" step="1" value="36" aria-describedby="monthsLabel">
+          </div>
+          <div class="field">
+            <label for="newRate">Ставка в другом банке <span>годовых</span></label>
+            <div class="box"><input id="newRate" type="number" min="1" max="99" step="0.1" value="20" inputmode="decimal"><span class="unit">%</span></div>
+            <p class="hint">Пример. Реальную ставку под ваш кредит сторож найдёт сам.</p>
+          </div>
+          <div class="field">
+            <label for="fees">Расходы на переход <span>страховка, комиссии</span></label>
+            <div class="box"><input id="fees" type="number" min="0" max="1000000" step="500" value="0" inputmode="numeric"><span class="unit">₽</span></div>
+          </div>
+        </form>
+
+        <div class="calc-out" aria-live="polite">
+          <span class="verdict good" id="verdict">Выгодно перевести</span>
+          <div>
+            <div class="headline-num num good" id="total">92 028 ₽</div>
+            <p class="headline-cap" id="totalCap">сэкономите за оставшийся срок</p>
+          </div>
+          <div class="compare">
+            <div class="cmp now"><small>Платёж сейчас</small><b class="num" id="payNow">17 422 ₽</b><em>в месяц</em></div>
+            <div class="cmp new"><small>После перехода</small><b class="num" id="payNew">14 865 ₽</b><em>в месяц</em></div>
+          </div>
+          <div class="rows">
+            <div><span>Экономия в месяц</span><b class="num" id="perMonth">2 556 ₽</b></div>
+            <div><span>Экономия в год</span><b class="num" id="perYear">30 676 ₽</b></div>
+            <div><span>Переплата по процентам сейчас</span><b class="num" id="interestNow">227 196 ₽</b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="watch reveal" id="watch" style="--d:.1s">
+        <div>
+          <h3>Не хотите следить за ставками сами?</h3>
+          <p>Оставьте Telegram. Мы напишем, когда перевод вашего кредита станет выгодным. Бесплатно.</p>
+        </div>
+        <div>
+          <form id="watchForm" novalidate>
+            <label for="contact" class="sr" style="position:absolute;left:-9999px">Telegram или почта</label>
+            <input id="contact" name="contact" placeholder="@username или почта" autocomplete="off">
+            <button class="btn" type="submit">Сообщить, когда выгодно</button>
+            <p class="err" id="err" hidden>Введите ник в Telegram (например, @ivan) или почту.</p>
+          </form>
+          <div class="done" id="done">
+            <b>Готово, вы в списке</b>
+            <span>Это демо: в этой версии заявки пока не сохраняются.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="sec-head reveal">
+        <h2>Как это работает</h2>
+        <p>Вам не нужно ничего считать и проверять банки каждую неделю.</p>
+      </div>
+      <div class="steps">
+        <div class="step reveal" style="--d:0.00s"><h3>Покажите свои кредиты</h3><p>Загрузите отчёт кредитной истории или впишите кредиты вручную. Бот сам найдёт ставки, остатки и сроки.</p></div>
+        <div class="step reveal" style="--d:0.12s"><h3>Мы следим каждый день</h3><p>Сверяем ваши условия со ставками банков и считаем выгоду с учётом страховок и комиссий.</p></div>
+        <div class="step reveal" style="--d:0.24s"><h3>Пишем, когда пора</h3><p>Сообщение придёт, только если переход действительно выгоден. С суммой экономии и списком банков.</p></div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="faq">
+        <div class="sec-head reveal"><h2>Вопросы</h2></div>
+        <div>
+          <details class="reveal" style="--d:0.00s" open><summary>Это бесплатно?</summary><p>Да. Если вы переведёте кредит по нашей ссылке, банк может заплатить нам за привлечённого клиента. Для вас стоимость кредита от этого не меняется.</p></details>
+          <details class="reveal" style="--d:0.08s"><summary>Нужен ли доступ к моему банку?</summary><p>Нет. Мы не просим пароли, данные карт или доступ к счетам. Достаточно отчёта кредитной истории или условий кредита, которые вы впишете сами.</p></details>
+          <details class="reveal" style="--d:0.16s"><summary>Где взять отчёт кредитной истории?</summary><p>Его можно запросить в бюро кредитных историй, в том числе через Госуслуги. Подойдёт файл PDF.</p></details>
+          <details class="reveal" style="--d:0.24s"><summary>Что если банк откажет?</summary><p>Решение всегда принимает банк. Поэтому мы показываем несколько банков, а не один, и предупреждаем, когда выгода слишком мала, чтобы связываться.</p></details>
+          <details class="reveal" style="--d:0.32s"><summary>Почему калькулятор пишет «пока невыгодно»?</summary><p>Иногда разница в ставке меньше, чем страховки и комиссии при переходе. Тогда лучше подождать. Сторож напишет, когда цифры изменятся.</p></details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Refinance · ранняя версия</span>
+    <span>Расчёты примерные и не являются финансовой рекомендацией.</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var COUNT_MS = 960;            // счёт цифр (на 40% быстрее прежних 1600 мс)
+  function fmt(v, d){ return v.toLocaleString('ru-RU', {minimumFractionDigits:d||0, maximumFractionDigits:d||0}).replace(/ /g,' '); }
+  function rub(x){ return fmt(Math.round(x)) + ' ₽'; }
+  function ease(k){ return 1 - Math.pow(1-k, 3); }
+
+  // animated number: el shows render(value); animates from its last value
+  var anims = new WeakMap();
+  function setNum(el, to, render, ms, from){
+    var st = anims.get(el) || {cur: 0};
+    var start = (from !== undefined) ? from : st.cur;
+    if (st.raf) cancelAnimationFrame(st.raf);
+    if (reduce || ms === 0 || start === to){ st.cur = to; el.textContent = render(to); anims.set(el, st); return; }
+    var t0 = null;
+    function step(ts){
+      if (t0 === null) t0 = ts;
+      var k = Math.min(1, (ts - t0)/ms), v = start + (to - start)*ease(k);
+      st.cur = v; el.textContent = render(v);
+      if (k < 1) st.raf = requestAnimationFrame(step); else { st.cur = to; st.raf = 0; }
+    }
+    anims.set(el, st);
+    st.raf = requestAnimationFrame(step);
+  }
+
+  function pay(P, annual, n){
+    var r = annual/100/12;
+    if (r === 0) return P/n;
+    return P*r/(1-Math.pow(1+r,-n));
+  }
+  function val(id, d){ var v = parseFloat($(id).value); return isFinite(v) && v >= 0 ? v : d; }
+
+  var state = {perMonth:0, calcSeen:false, heroDone:false};
+
+  function calc(ms){
+    var P = val('debt', 0), r1 = val('rate', 0), r2 = val('newRate', 0), n = Math.max(1, Math.round(val('months', 36))), fees = val('fees', 0);
+    $('monthsLabel').textContent = n + ' мес.';
+    var a = P > 0 && r1 > 0 ? pay(P, r1, n) : 0;
+    var b = P > 0 && r2 > 0 ? pay(P, r2, n) : 0;
+    var perMonth = a - b;
+    var total = perMonth*n - fees;
+    state.perMonth = Math.max(0, perMonth);
+
+    var cms = state.calcSeen ? ms : 0;   // калькулятор считает только когда его видно
+    setNum($('payNow'), a, rub, cms);
+    setNum($('payNew'), b, rub, cms);
+    setNum($('perMonth'), perMonth, rub, cms);
+    setNum($('perYear'), perMonth*12, rub, cms);
+    setNum($('interestNow'), a*n - P, rub, cms);
+
+    var v = $('verdict'), t = $('total');
+    v.className = 'verdict'; t.className = 'headline-num num';
+    if (total >= 10000){
+      v.classList.add('good'); v.textContent = 'Выгодно перевести';
+      t.classList.add('good');
+      $('totalCap').textContent = fees > 0 ? 'сэкономите за оставшийся срок с учётом расходов на переход' : 'сэкономите за оставшийся срок';
+    } else if (total > 0){
+      v.classList.add('mid'); v.textContent = 'Выгода небольшая';
+      $('totalCap').textContent = 'сэкономите за оставшийся срок. Возможно, стоит подождать снижения ставок';
+    } else {
+      v.classList.add('bad'); v.textContent = 'Пока невыгодно';
+      t.classList.add('bad');
+      $('totalCap').textContent = r2 >= r1 ? 'потеряете при переходе: ставка в другом банке не ниже вашей' : 'потеряете при переходе: расходы больше экономии';
+    }
+    setNum(t, Math.abs(total), rub, cms);
+
+    // телефон и карточки на главном экране повторяют калькулятор
+    var hms = state.heroDone ? ms : 0;
+    setNum($('phoneSave'), perMonth*12, function(x){ return perMonth > 0 ? '−' + rub(x) + ' в год' : 'Пока невыгодно'; }, hms);
+    setNum($('phonePay'), b, rub, hms);
+    setNum($('phoneOld'), a, rub, hms);
+    setNum($('floatLoss'), Math.max(0, perMonth), rub, hms);
+    setNum($('floatSave'), Math.max(0, total), rub, hms);
+  }
+
+  ['debt','rate','months','newRate','fees'].forEach(function(id){ $(id).addEventListener('input', function(){ calc(420); }); });
+  calc(0);
+
+  // главный экран: цифры набегают от нуля в момент, когда появляется их объект
+  function countFromZero(el, delay){
+    var st = anims.get(el) || {cur:0};
+    var to = st.cur, render;
+    var txt = el.textContent;
+    if (el.id === 'phoneSave') render = function(x){ return '−' + rub(x) + ' в год'; };
+    else render = rub;
+    if (reduce) return;
+    el.textContent = render(0);
+    setTimeout(function(){ setNum(el, to, render, COUNT_MS, 0); }, delay);
+  }
+  if (state.perMonth > 0){
+    countFromZero($('floatLoss'), 1450);
+    countFromZero($('phoneOld'), 2700);
+    countFromZero($('phonePay'), 2700);
+    countFromZero($('phoneSave'), 2700);
+    countFromZero($('floatSave'), 3300);
+  }
+  setTimeout(function(){ state.heroDone = true; }, 3300 + COUNT_MS);
+
+  // сводка 430,5 / −25 / 34,35
+  document.querySelectorAll('[data-to]').forEach(function(el){
+    var to = parseFloat(el.dataset.to), d = +el.dataset.dec;
+    if (reduce) return;
+    el.textContent = fmt(0, d);
+    setTimeout(function(){ setNum(el, to, function(x){ return fmt(x, d); }, COUNT_MS, 0); }, 550);
+  });
+
+  // счётчик переплаты: сначала набегает, потом тикает каждую секунду
+  function overpaid(){
+    var now = new Date(), start = new Date(now.getFullYear(), 0, 1);
+    return (now - start)/1000 * state.perMonth*12/(365*24*3600);
+  }
+  var tickEl = $('tick'), ticking = false;
+  function render2(x){ return fmt(x, 2) + ' ₽'; }
+  if (reduce){ ticking = true; }
+  else { tickEl.textContent = render2(0); setTimeout(function(){ setNum(tickEl, overpaid(), render2, COUNT_MS, 0); setTimeout(function(){ ticking = true; }, COUNT_MS); }, 800); }
+  setInterval(function(){ if (ticking) tickEl.textContent = render2(overpaid()); }, 1000);
+
+  // объекты ниже первого экрана выскакивают, когда до них доходит прокрутка
+  var revealEls = document.querySelectorAll('.reveal');
+  if (!reduce && 'IntersectionObserver' in window){
+    var vh = window.innerHeight;
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (!en.isIntersecting) return;
+        en.target.classList.remove('pre');
+        io.unobserve(en.target);
+        if (en.target.id === 'calcBox' && !state.calcSeen){
+          state.calcSeen = true;
+          ['payNow','payNew','perMonth','perYear','interestNow','total'].forEach(function(id){
+            var el = $(id), st = anims.get(el) || {cur:0};
+            setNum(el, st.cur, rub, COUNT_MS, 0);
+          });
+        }
+      });
+    }, {rootMargin:'0px 0px -12% 0px', threshold:0.12});
+    revealEls.forEach(function(el){
+      if (el.getBoundingClientRect().top > vh * 0.9){ el.classList.add('pre'); io.observe(el); }
+      else if (el.id === 'calcBox'){ state.calcSeen = true; }
+    });
+  } else { state.calcSeen = true; }
+  window.addEventListener('beforeprint', function(){ revealEls.forEach(function(el){ el.classList.remove('pre'); }); });
+
+  // форма сторожа (демо: заявки пока не сохраняются)
+  $('watchForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var v = $('contact').value.trim();
+    var ok = /^@?[A-Za-z0-9_]{5,32}$/.test(v) || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    $('err').hidden = ok;
+    if (!ok){ $('contact').focus(); return; }
+    $('watchForm').style.display = 'none';
+    $('done').style.display = 'block';
+  });
+})();
+</script>
+</body>
+</html>
